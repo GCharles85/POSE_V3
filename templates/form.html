@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Car Codes</title>
+</head>
+<body>
+    <h1>Select Car Codes</h1>
+    <form id="codeForm">
+        <label><input type="checkbox" name="codes" value="P0001"> P0001</label><br>
+        <label><input type="checkbox" name="codes" value="P0002"> P0002</label><br>
+        <label><input type="checkbox" name="codes" value="P0003"> P0003</label><br>
+        <label><input type="checkbox" name="codes" value="P0004"> P0004</label><br>
+        <label><input type="checkbox" name="codes" value="P0005"> P0005</label><br>
+        <label><input type="checkbox" name="codes" value="P0006"> P0006</label><br>
+        <label><input type="checkbox" name="codes" value="P0007"> P0007</label><br>
+        <label><input type="checkbox" name="codes" value="P0008"> P0008</label><br>
+        <label><input type="checkbox" name="codes" value="P0009"> P0009</label><br>
+        <label><input type="checkbox" name="codes" value="P0010"> P0010</label><br>
+        <button type="button" onclick="submitCodes()">Submit</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        function submitCodes() {
+            // Collect checked codes
+            const selectedCodes = Array.from(document.querySelectorAll('input[name="codes"]:checked'))
+                .map(checkbox => checkbox.value);
+            // Log the selected codes to the console
+            
+            if (selectedCodes.length === 0) {
+                alert("Please select at least one code.");
+                return;
+            }
+
+            // Send the selected codes to the backend via an API call
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ codes: selectedCodes })
+                
+            })
+            .then(response => response.json())
+            .then(data => {
+			console.log('Response Data:', data); 
+                // Display the predicted issues in the result div
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <h2>Predicted Issues:</h2>
+                    <pre>${JSON.stringify(data.predicted_issues, null, 2)}</pre>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
